@@ -37,6 +37,22 @@ func inputFloat(ctx context.Context, prompt string, placeholder string, defaultV
     }
 }
 
+func RK4(function func(float64, float64) float64, x0 float64, y0 float64, x_end float64, h float64) float64 {
+	n := int((x_end - x0)/h)
+
+	for range n {
+		k1 := function(x0, y0)
+		k2 := function(x0 + h/2, y0 + (h/2) * k1)
+		k3 := function(x0 + h/2, y0 + (h/2) * k2)
+		k4 := function(x0 + h, y0 + h * k3)
+
+		x0 += h
+		y0 = y0 + (h/6) * (k1 + 2 * k2 + 2 * k3 + k4)
+	}
+
+	return y0
+}
+
 func RunRungeKutta(ctx context.Context) error {
 	expression := tap.Text(ctx, tap.TextOptions{
 		Message: "Input f(x, y) for different equation dy/dx = f(x, y)",
@@ -52,19 +68,9 @@ func RunRungeKutta(ctx context.Context) error {
 	x_end := inputFloat(ctx, "Input right border of the interval for integration (x1)", "Input x1...", 1.0)
 	h := inputFloat(ctx, "Input step (h)", "Input h...", 0.0)
 
-	n := int((x_end - x0)/h)
-
-	for range n {
-		k1 := function(x0, y0)
-		k2 := function(x0 + h/2, y0 + (h/2) * k1)
-		k3 := function(x0 + h/2, y0 + (h/2) * k2)
-		k4 := function(x0 + h, y0 + h * k3)
-
-		x0 += h
-		y0 = y0 + (h/6) * (k1 + 2 * k2 + 2 * k3 + k4)
-	}
-
-	fmt.Printf("Result: %f", y0)
+	result := RK4(function, x0, y0, x_end, h)
+	
+	fmt.Printf("Result: %f", result)
 
     return nil
 }
