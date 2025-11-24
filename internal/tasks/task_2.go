@@ -209,7 +209,7 @@ func j2Gravity(t float64, state []float64) []float64 {
 	z2 := z * z
 
 	// Общий множитель J2
-	factor := -1.5 * J2 * (Re*Re) / (r2 * r2)
+	factor := -1.5 * J2 * (Re*Re) / (r2)
 
 	// Поправки
 	Cxy := factor * (5.0*z2/r2 - 1.0)
